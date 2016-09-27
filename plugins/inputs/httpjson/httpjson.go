@@ -179,7 +179,7 @@ func (h *HttpJson) gatherServer(
 	acc telegraf.Accumulator,
 	serverURL string,
 ) error {
-	resp, responseTime, err := h.sendRequest(serverURL)
+	resp, _, err := h.sendRequest(serverURL)
 
 	if err != nil {
 		return err
@@ -206,12 +206,28 @@ func (h *HttpJson) gatherServer(
 	}
 
 	for _, metric := range metrics {
-		fields := make(map[string]interface{})
-		for k, v := range metric.Fields() {
-			fields[k] = v
+		// original returns only one metric with many fields.
+		// i think a better solution are many metric each with one field.
+		//fields := make(map[string]interface{})
+		//for k, v := range metric.Fields() {
+		//	fields[k] = v
+		//}
+		//fields["response_time"] = responseTime
+		//acc.AddFields(metric.Name(), fields, metric.Tags())
+		
+		for fieldName, field := range metric.Fields() {
+			singleField := make(map[string]interface{})	
+			singleField["value"] = field		
+			var transformedFieldName = strings.Replace(fieldName, ".", "_", -1)
+			
+			metric, err := telegraf.NewMetric(metric.Name + "_" + transformedFieldName, metric.Tags, singleField, metric.Time)
+
+			if err != nil {
+				return nil, err
+			}
 		}
-		fields["response_time"] = responseTime
-		acc.AddFields(metric.Name(), fields, metric.Tags())
+		
+		
 	}
 	return nil
 }
