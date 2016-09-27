@@ -8,7 +8,7 @@ PATH := $(subst :,/bin:,$(GOPATH))/bin:$(PATH)
 endif
 
 # Standard Telegraf build
-default: prepare build
+default: prepare build-for-docker
 
 # Windows build
 windows: prepare-windows build-windows
