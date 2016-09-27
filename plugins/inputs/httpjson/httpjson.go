@@ -220,11 +220,7 @@ func (h *HttpJson) gatherServer(
 			singleField["value"] = field		
 			var transformedFieldName = strings.Replace(fieldName, ".", "_", -1)
 			
-			metric, err := telegraf.NewMetric(metric.Name() + "_" + transformedFieldName, metric.Tags(), singleField, metric.Time())
-
-			if err != nil {
-				return nil, err
-			}
+			acc.AddFields(metric.Name() + "_" + transformedFieldName, singleField, metric.Tags())
 		}
 		
 		
