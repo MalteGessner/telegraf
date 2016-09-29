@@ -206,26 +206,36 @@ func (h *HttpJson) gatherServer(
 	}
 
 	for _, metric := range metrics {
-		// original returns only one metric with many fields.
-		// i think a better solution are many metric each with one field.
-		//fields := make(map[string]interface{})
-		//for k, v := range metric.Fields() {
-		//	fields[k] = v
-		//}
-		//fields["response_time"] = responseTime
-		//acc.AddFields(metric.Name(), fields, metric.Tags())
-		
-		for fieldName, field := range metric.Fields() {
-			singleField := make(map[string]interface{})	
-			singleField["value"] = field		
-			var transformedFieldName = strings.Replace(fieldName, ".", "_", -1)
-			
-			acc.AddFields(metric.Name() + "_" + transformedFieldName, singleField, metric.Tags())
+		metricGroups := make(map[string]map[string]interface{})
+
+		for fieldName, fieldValue := range metric.Fields() {
+			lastDot := strings.LastIndex(fieldName, ".")
+			newMetricGroupName := fieldName
+			newFieldName := "value"
+
+			if lastDot > 0 {
+				newMetricGroupName = metric.Name() + "." + fieldName[:lastDot]
+				newFieldName = fieldName[lastDot+1 : len(fieldName)]
+			}
+
+			add(metricGroups, newMetricGroupName, newFieldName, fieldValue)
 		}
-		
-		
+
+		for metricGroupName, fields := range metricGroups {
+			acc.AddFields(metricGroupName, fields, metric.Tags())
+		}
+
 	}
 	return nil
+}
+
+func add(m map[string]map[string]interface{}, metricGroupName, fieldName string, fieldValue interface{}) {
+	mm, ok := m[metricGroupName]
+	if !ok {
+		mm = make(map[string]interface{})
+		m[metricGroupName] = mm
+	}
+	mm[fieldName] = fieldValue
 }
 
 // Sends an HTTP request to the server using the HttpJson object's HTTPClient.
