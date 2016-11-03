@@ -218,6 +218,10 @@ func (h *HttpJson) gatherServer(
 				newFieldName = fieldName[lastDot+1 : len(fieldName)]
 			}
 
+			if newFieldName == "time" {
+				newFieldName = "timeValue"
+			}
+
 			add(metricGroups, newMetricGroupName, newFieldName, fieldValue)
 		}
 
