@@ -200,7 +200,7 @@ func (h *HttpJson) gatherServer(
 	}
 
 	for k, v := range h.StaticTags {
-		tags.Add(k, v)
+		tags[k] = v
 	}
 
 	parser, err := parsers.NewJSONParser(msrmnt_name, h.TagKeys, tags)
