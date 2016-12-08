@@ -19,7 +19,7 @@ import (
 // HttpJson struct
 type HttpJson struct {
 	Name            string
-	Tags            map[string]string
+	Namespace       string
 	Servers         []string
 	Method          string
 	TagKeys         []string
@@ -77,8 +77,7 @@ var sampleConfig = `
   ## a name for the service being polled
   name = "webserver_stats"
   ## a namespace used as as extra tag in measurement
-  [inputs.httpjson.tags]
-	namespace = "bbox"
+  namespace = "bbox"
 
   ## URL of each server in the service's cluster
   servers = [
@@ -196,11 +195,8 @@ func (h *HttpJson) gatherServer(
 		msrmnt_name = "httpjson_" + h.Name
 	}
 	tags := map[string]string{
-		"server": serverURL,
-	}
-
-	for k, v := range h.Tags {
-		tags[k] = v
+		"server":    serverURL,
+		"namespace": h.Namespace,
 	}
 
 	parser, err := parsers.NewJSONParser(msrmnt_name, h.TagKeys, tags)
