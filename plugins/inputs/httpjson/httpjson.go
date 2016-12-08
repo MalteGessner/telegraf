@@ -19,7 +19,7 @@ import (
 // HttpJson struct
 type HttpJson struct {
 	Name            string
-	StaticTags      map[string]string
+	Tags            map[string]string
 	Servers         []string
 	Method          string
 	TagKeys         []string
@@ -77,7 +77,7 @@ var sampleConfig = `
   ## a name for the service being polled
   name = "webserver_stats"
   ## a namespace used as as extra tag in measurement
-  [inputs.httpjson.static_tags]
+  [inputs.httpjson.tags]
 	namespace = "bbox"
 
   ## URL of each server in the service's cluster
@@ -199,7 +199,7 @@ func (h *HttpJson) gatherServer(
 		"server": serverURL,
 	}
 
-	for k, v := range h.StaticTags {
+	for k, v := range h.Tags {
 		tags[k] = v
 	}
 
