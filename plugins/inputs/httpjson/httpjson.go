@@ -220,6 +220,8 @@ func (h *HttpJson) gatherServer(
 			if lastDot > 0 {
 				newMetricGroupName = metric.Name() + "." + fieldName[:lastDot]
 				newFieldName = fieldName[lastDot+1 : len(fieldName)]
+			} else {
+				newMetricGroupName = metric.Name() + "." + newFieldName
 			}
 
 			if newFieldName == "time" {
